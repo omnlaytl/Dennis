@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="密碼庫">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>密碼庫</title>
+</head>
+<body>
+
+  <!-- 首次設定 -->
+  <section id="view-setup" class="view center" hidden>
+    <div class="card narrow">
+      <img src="icons/icon-192.png" alt="" class="logo">
+      <h1>建立密碼庫</h1>
+      <p class="muted">請設定一組主密碼。主密碼用來加密所有資料，也是 Face ID 無法使用時的備用解鎖方式。</p>
+      <form id="setup-form" class="stack" autocomplete="off">
+        <label class="field">
+          <span>主密碼（至少 10 個字元）</span>
+          <input id="setup-pw" type="password" minlength="10" required autocomplete="new-password">
+        </label>
+        <div class="strength" id="setup-strength"><i></i><i></i><i></i><i></i></div>
+        <label class="field">
+          <span>再次輸入</span>
+          <input id="setup-pw2" type="password" required autocomplete="new-password">
+        </label>
+        <p class="warn small">主密碼無法找回。忘記主密碼又無法使用 Face ID 時，資料將永久無法解密。</p>
+        <button class="btn primary block" type="submit">建立</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 鎖定畫面 -->
+  <section id="view-lock" class="view center" hidden>
+    <div class="card narrow">
+      <img src="icons/icon-192.png" alt="" class="logo">
+      <h1>密碼庫</h1>
+      <p class="muted small">資料只加密儲存在這部裝置</p>
+      <button id="btn-faceid" class="btn primary block" type="button" hidden>
+        <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9v1M15 9v1M12 9v4h-1M9.5 15.5a3.5 3.5 0 0 0 5 0"/></svg>
+        使用 Face ID 解鎖
+      </button>
+      <form id="lock-form" class="stack" autocomplete="off">
+        <label class="field">
+          <span>主密碼</span>
+          <input id="lock-pw" type="password" required autocomplete="current-password">
+        </label>
+        <button class="btn block" type="submit">以主密碼解鎖</button>
+      </form>
+      <p id="lock-error" class="error small" role="alert"></p>
+    </div>
+  </section>
+
+  <!-- 主畫面 -->
+  <section id="view-main" class="view" hidden>
+    <header class="topbar">
+      <button id="btn-settings" class="icon-btn" type="button" aria-label="設定">
+        <svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+      <h1 class="title">密碼庫</h1>
+      <div class="topbar-right">
+        <button id="btn-lock" class="icon-btn" type="button" aria-label="立即鎖定">
+          <svg viewBox="0 0 24 24" class="ico"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </button>
+        <button id="btn-add" class="icon-btn accent" type="button" aria-label="新增">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-inner">
+      <div class="search">
+        <svg viewBox="0 0 24 24" class="ico"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="搜尋名稱、帳號或網址" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div id="chips" class="chips" role="tablist" aria-label="分類"></div>
+      <ul id="list" class="list"></ul>
+      <div id="empty" class="empty" hidden>
+        <p class="empty-title">尚無資料</p>
+        <p class="muted">點右上角 + 新增，或匯入 Excel／CSV。</p>
+        <button id="btn-empty-import" class="btn primary" type="button">匯入 Excel／CSV</button>
+      </div>
+      <p id="count" class="muted small center-text"></p>
+    </div>
+  </section>
+
+  <!-- 隱私遮罩 -->
+  <div id="cover" class="cover" popover="manual" hidden>
+    <img src="icons/icon-192.png" alt="">
+  </div>
+
+  <!-- 對話框容器 -->
+  <dialog id="dlg" class="sheet"></dialog>
+  <dialog id="dlg2" class="sheet small-sheet"></dialog>
+
+  <input id="file-import" type="file" accept=".csv,.xlsx,.xlsm,.txt,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+  <input id="file-backup" type="file" hidden>
+
+  <div id="toast" class="toast" popover="manual" role="status" aria-live="polite" hidden></div>
+  <dialog id="busy" class="busy"><div class="spinner"></div><span id="busy-text">處理中…</span></dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
